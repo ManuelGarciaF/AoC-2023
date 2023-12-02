@@ -34,7 +34,8 @@ func main() {
 	games := parseInput("./input")
 	// games := parseInput("./inputSample")
 
-	fmt.Println(solvePart1(games))
+	// fmt.Println(solvePart1(games))
+	fmt.Println(solvePart2(games))
 }
 
 func solvePart1(games map[int]Game) int {
@@ -68,6 +69,32 @@ func solvePart1(games map[int]Game) int {
 			fmt.Printf("Game %d is possible\n", id)
 			sum += id
 		}
+	}
+	return sum
+}
+
+func solvePart2(games map[int]Game) int {
+	sum := 0
+
+	for _, game := range games {
+		red, green, blue := 0, 0, 0
+		for _, reveal := range game {
+			for _, pull := range reveal {
+
+				switch pull.color {
+				case Red:
+					red = max(red, pull.n)
+					break
+				case Green:
+					green = max(green, pull.n)
+					break
+				case Blue:
+					blue = max(blue, pull.n)
+					break
+				}
+			}
+		}
+		sum += red * green * blue
 	}
 	return sum
 }

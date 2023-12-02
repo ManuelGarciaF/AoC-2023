@@ -12,15 +12,6 @@ const (
 	greenTotal = 13
 	blueTotal  = 14
 )
-
-type Color int
-
-const (
-	Red Color = iota
-	Blue
-	Green
-)
-
 type Game []Reveal
 
 type Reveal []Pull
@@ -29,6 +20,15 @@ type Pull struct {
 	color Color
 	n     int
 }
+
+type Color int
+
+const (
+	Red Color = iota
+	Green
+	Blue
+)
+
 
 func main() {
 	games := parseInput("./input")
@@ -121,31 +121,27 @@ func parseGame(str string) Game {
 	if !ok {
 		panic("input not in expected format")
 	}
+
 	revealStrings := strings.Split(str, "; ")
 
 	reveals := make([]Reveal, 0, len(revealStrings))
-
 	for _, revealString := range revealStrings {
 		reveals = append(reveals, parseReveal(revealString))
 	}
-
 	return reveals
 }
 
 func parseReveal(str string) Reveal {
-	pulls := strings.Split(str, ", ")
+	pullStrings := strings.Split(str, ", ")
 
-	reveal := make(Reveal, 0, len(pulls))
-
-	for _, pullStr := range pulls {
-		reveal = append(reveal, parsePull(pullStr))
+	pulls := make([]Pull, 0, len(pullStrings))
+	for _, pullString := range pullStrings {
+		pulls = append(pulls, parsePull(pullString))
 	}
-
-	return reveal
+	return pulls
 }
 
 func parsePull(str string) Pull {
-
 	nStr, colorStr, ok := strings.Cut(str, " ")
 	if !ok {
 		panic("input not in expected format")
@@ -167,6 +163,6 @@ func parseColorStr(str string) Color {
 	case "green":
 		return Green
 	default:
-		return -1
+		panic("input not in expected format")
 	}
 }

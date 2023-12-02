@@ -12,6 +12,7 @@ const (
 	greenTotal = 13
 	blueTotal  = 14
 )
+
 type Game []Reveal
 
 type Reveal []Pull
@@ -28,7 +29,6 @@ const (
 	Green
 	Blue
 )
-
 
 func main() {
 	games := parseInput("./input")

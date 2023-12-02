@@ -77,24 +77,23 @@ func solvePart2(games map[int]Game) int {
 	sum := 0
 
 	for _, game := range games {
-		red, green, blue := 0, 0, 0
+		maxRed, maxGreen, maxBlue := 0, 0, 0
 		for _, reveal := range game {
 			for _, pull := range reveal {
-
 				switch pull.color {
 				case Red:
-					red = max(red, pull.n)
+					maxRed = max(maxRed, pull.n)
 					break
 				case Green:
-					green = max(green, pull.n)
+					maxGreen = max(maxGreen, pull.n)
 					break
 				case Blue:
-					blue = max(blue, pull.n)
+					maxBlue = max(maxBlue, pull.n)
 					break
 				}
 			}
 		}
-		sum += red * green * blue
+		sum += maxRed * maxGreen * maxBlue
 	}
 	return sum
 }

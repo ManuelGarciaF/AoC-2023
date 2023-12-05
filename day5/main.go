@@ -40,13 +40,31 @@ func main() {
 	}
 
 	fmt.Println(solvePart1(string(bytes)))
-	// fmt.Println(solvePart2(string(bytes)))
+	fmt.Println(solvePart2(string(bytes)))
 }
 
 func solvePart1(input string) int {
 	seeds, mappings := parseInput(input)
-	// fmt.Printf("%#v\n", seeds)
-	// fmt.Printf("%v\n", mappings)
+	lowestLocation := -1
+	for _, seed := range seeds {
+		// println("seed: ", seed)
+		mappedVal := seed
+		for _, mapping := range mappings {
+			mappedVal = mapping.convert(mappedVal)
+			// println("\tmap", i, ":", mappedVal)
+		}
+		if mappedVal < lowestLocation || lowestLocation < 0 {
+			lowestLocation = mappedVal
+		}
+	}
+
+	return lowestLocation
+}
+
+func solvePart2(input string) int {
+	seedRanges, mappings := parseInput(input)
+
+
 	lowestLocation := -1
 	for _, seed := range seeds {
 		// println("seed: ", seed)

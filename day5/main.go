@@ -17,8 +17,16 @@ func (r RangeMapping) convert(input int) int {
 	return r.dstRangeStart + input - r.srcRangeStart
 }
 
+func (r RangeMapping) inverseConvert(input int) int {
+	return r.srcRangeStart + input - r.dstRangeStart
+}
+
 func (r RangeMapping) inRange(input int) bool {
 	return input >= r.srcRangeStart && input < (r.srcRangeStart+r.rangeLen)
+}
+
+func (r RangeMapping) inDstRange(input int) bool {
+	return input >= r.dstRangeStart && input < (r.dstRangeStart+r.rangeLen)
 }
 
 type Mapping []RangeMapping
@@ -30,6 +38,24 @@ func (m Mapping) convert(input int) int {
 		}
 	}
 	return input // Maps to the same number
+}
+
+func (m Mapping) inverseConvert(input int) int {
+	for _, r := range m {
+		if r.inDstRange(input) {
+			return r.inverseConvert(input)
+		}
+	}
+	return input // Maps to the same number
+}
+
+type Range struct {
+	start  int
+	length int
+}
+
+func (r Range) inRange(input int) bool {
+	return input >= r.start && input < (r.start+r.length)
 }
 
 func main() {
@@ -62,23 +88,46 @@ func solvePart1(input string) int {
 }
 
 func solvePart2(input string) int {
-	seedRanges, mappings := parseInput(input)
+	seedInfo, mappings := parseInput(input)
+	seedRanges := parseSeedRanges(seedInfo)
 
-
-	lowestLocation := -1
-	for _, seed := range seeds {
-		// println("seed: ", seed)
-		mappedVal := seed
-		for _, mapping := range mappings {
-			mappedVal = mapping.convert(mappedVal)
-			// println("\tmap", i, ":", mappedVal)
-		}
-		if mappedVal < lowestLocation || lowestLocation < 0 {
-			lowestLocation = mappedVal
-		}
+	location := 0
+	for !locationInSeeds(location, seedRanges, mappings) { // Until location is in the seed ranges
+		location++
 	}
 
-	return lowestLocation
+	return location
+}
+
+func parseSeedRanges(seedInfo []int) []Range {
+	ranges := make([]Range, 0, len(seedInfo)/2)
+	for i := 0; i < len(seedInfo); i += 2 {
+		ranges = append(ranges, Range{
+			start:  seedInfo[i],
+			length: seedInfo[i+1],
+		})
+	}
+	return ranges
+}
+
+func locationInSeeds(location int, seedRanges []Range, mappings []Mapping) bool {
+	seed := seedFromLocation(location, mappings)
+
+	for _, seedRange := range seedRanges {
+		if seedRange.inRange(seed) {
+			return true
+		}
+	}
+	return false
+}
+
+func seedFromLocation(location int, mappings []Mapping) int {
+	value := location
+	// Iterate over mappings backwards
+	for i := len(mappings) - 1; i >= 0; i-- {
+		value = mappings[i].inverseConvert(value)
+	}
+	return value
 }
 
 func parseInput(input string) (seeds []int, mappings []Mapping) {

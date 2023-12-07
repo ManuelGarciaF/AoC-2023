@@ -24,9 +24,9 @@ type Hand struct {
 type Card int
 
 const (
-	J Card = 1
 	// ints from 2 to 9 and
-	T Card = iota + 9
+	T Card = iota + 10
+	J
 	Q
 	K
 	A
@@ -47,11 +47,14 @@ const (
 func main() {
 	// plays := parseInput("./sample")
 	plays := parseInput("./input")
+	for _, play := range plays {
+		fmt.Println(play.hand)
+	}
 
-	fmt.Println(solvePart2(plays))
+	fmt.Println(solvePart1(plays))
 }
 
-func solvePart2(plays []Play) uint64 {
+func solvePart1(plays []Play) uint64 {
 	slices.SortFunc(plays, func(a, b Play) int {
 		if a.hand.handType == b.hand.handType {
 			// Compare cards until one is different
@@ -139,17 +142,10 @@ func getHandType(cards []Card) HandType {
 		counts[card]++
 	}
 
-	// Consider jokers separately
-	jokers := counts[J]
-	counts[J] = 0
-
 	countValues := mapValues(counts)
 	slices.SortFunc(countValues, func(a, b int) int {
 		return cmp.Compare(b, a)
 	})
-
-	// We always want to add jokers to the card we have the most of
-	countValues[0] += jokers
 
 	switch countValues[0] {
 	case 1:

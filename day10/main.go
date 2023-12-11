@@ -145,18 +145,3 @@ func parseInput(inputPath string) PipeLayout {
 	}
 	return lines
 }
-
-func graphGrid(grid [][]Cell) {
-	for _, line := range grid {
-		for _, cell := range line {
-			if cell == UNDECIDED {
-				fmt.Print(" ")
-			} else if cell == PIPE {
-				fmt.Print(".")
-			} else {
-				fmt.Print("X")
-			}
-		}
-		fmt.Println()
-	}
-}

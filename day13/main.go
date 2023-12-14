@@ -32,10 +32,22 @@ func imageSummary(image InputImage, allowSmudges bool) int {
 			return (x + 1) * 100
 		}
 	}
-	// Iterate over cols
-	for y := 0; y < len(image[0])-1; y++ {
-		if colSymm(image, y, allowSmudges) {
-			return y + 1
+
+	// Transpose image
+	transposed := make(InputImage, len(image[0]))
+	for i := 0; i < len(transposed); i++ {
+		transposed[i] = make([]byte, len(image))
+	}
+	for i := 0; i < len(image); i++ {
+		for j := 0; j < len(image[0]); j++ {
+			transposed[j][i] = image[i][j]
+		}
+	}
+
+	// Check "columns", rows of the transposed image
+	for x := 0; x < len(transposed)-1; x++ {
+		if rowSymm(transposed, x, allowSmudges) {
+			return x + 1
 		}
 	}
 	panic("No symmetry found")
@@ -68,44 +80,6 @@ func rowSymm(image InputImage, x int, allowSmudges bool) bool {
 		return true
 	}
 	return false
-}
-
-func colSymm(image InputImage, y int, allowSmudges bool) bool {
-	perfect := true
-	for offset := 0; offset < len(image[0]); offset++ {
-		// Stop if we went out of bounds
-		if y-offset < 0 || y+offset+1 >= len(image[0]) {
-			break
-		}
-		// Check all characters in lines match
-		if !columnsEqual(image, y-offset, y+offset+1) {
-			if !perfect { // If there was already an error
-				return false
-			}
-			for i := 0; i < len(image); i++ { // Check the error is only 1 char
-				if image[i][y-offset] != image[i][y+offset+1] {
-					if !perfect { // If there was already an error
-						return false
-					}
-					perfect = false
-				}
-			}
-		}
-	}
-	// Use perfects if !allowSmudges, ignore perfects if allowSmudges
-	if (perfect && !allowSmudges) || (!perfect && allowSmudges) {
-		return true
-	}
-	return false
-}
-
-func columnsEqual(image InputImage, y1, y2 int) bool {
-	for x := 0; x < len(image); x++ {
-		if image[x][y1] != image[x][y2] {
-			return false
-		}
-	}
-	return true
 }
 
 func parseInput(inputPath string) []InputImage {

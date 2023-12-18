@@ -2,6 +2,22 @@ package utils
 
 import "container/heap"
 
+// Normal queue
+type Queue[T any] []T
+
+func (q Queue[T]) IsEmpty() bool { return len(q) == 0 }
+
+func (q *Queue[T]) Push(elem T) {
+	*q = append(*q, elem)
+}
+
+func (q *Queue[T]) Pop() T {
+	n := len(*q)
+	elem := (*q)[n-1]
+	*q = (*q)[0 : n-1]
+	return elem
+}
+
 // Uses container/heap for implementation
 // Always pops the element with the lowest priority first
 type PriorityQueue[T comparable] []*PQItem[T]
@@ -38,7 +54,7 @@ func (pq *PriorityQueue[T]) Pop() any {
 	old := *pq
 	n := len(old)
 	item := old[n-1]
-	old[n-1] = nil // avoid memory leak
+	old[n-1] = nil  // avoid memory leak
 	item.index = -1 // for safety
 	*pq = old[0 : n-1]
 	return item

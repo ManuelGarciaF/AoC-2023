@@ -12,7 +12,7 @@ import (
 func main() {
 	heatLosses, sideLen := parseInput(os.Args[1])
 
-	fmt.Println("Part1: ", solve(heatLosses, sideLen, 1, 3))
+	fmt.Println("Part1: ", solve(heatLosses, sideLen, 0, 3))
 	fmt.Println("Part2: ", solve(heatLosses, sideLen, 3, 10))
 }
 
@@ -44,7 +44,6 @@ func solve(heatLosses map[utils.Coord]int, sideLen int, minStraight, maxStraight
 	for !frontier.IsEmpty() {
 		current := frontier.PopItem()
 		if current.Coord == goal {
-			fmt.Println("Found path!")
 			lastNode = current
 			break
 		}

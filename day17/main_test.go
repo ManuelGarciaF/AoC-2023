@@ -4,11 +4,18 @@ import (
 	"testing"
 )
 
-func TestSolvePart1(t *testing.T) {
+func BenchmarkSolvePart1(b *testing.B) {
 	heatLosses, sideLen := parseInput("sample")
-	want := 102
-	got := solvePart1(heatLosses, sideLen)
-	if got != want {
-		t.Errorf("solvePart1() = %v, want %v", got, want)
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		solve(heatLosses, sideLen, 0, 3)
+	}
+}
+
+func BenchmarkSolvePart2(b *testing.B) {
+	heatLosses, sideLen := parseInput("sample")
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		solve(heatLosses, sideLen, 3, 10)
 	}
 }

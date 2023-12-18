@@ -12,7 +12,8 @@ import (
 func main() {
 	heatLosses, sideLen := parseInput(os.Args[1])
 
-	fmt.Println("Part1: ", solvePart1(heatLosses, sideLen))
+	fmt.Println("Part1: ", solve(heatLosses, sideLen, 1, 3))
+	fmt.Println("Part2: ", solve(heatLosses, sideLen, 3, 10))
 }
 
 type Node struct {
@@ -21,7 +22,7 @@ type Node struct {
 	straightSteps int
 }
 
-func solvePart1(heatLosses map[utils.Coord]int, sideLen int) int {
+func solve(heatLosses map[utils.Coord]int, sideLen int, minStraight, maxStraight int) int {
 	// Dijkstra's algorithm
 	costs := make(map[Node]int, len(heatLosses))
 	cameFrom := make(map[Node]Node, len(heatLosses))
@@ -43,24 +44,29 @@ func solvePart1(heatLosses map[utils.Coord]int, sideLen int) int {
 	for !frontier.IsEmpty() {
 		current := frontier.PopItem()
 		if current.Coord == goal {
+			fmt.Println("Found path!")
 			lastNode = current
 			break
 		}
 
 		for _, neighbour := range neighbours(heatLosses, current.Coord) {
-			// Don't allow three consecutive moves in the same direction
 			currDir := utils.DirFromOffset[neighbour.Sub(current.Coord)]
-			if current.prevDir == currDir && current.straightSteps >= 2 {
+			turning := current.prevDir != currDir
+			// Don't allow turning before maxStraight steps
+			if !turning && current.straightSteps+1 >= maxStraight {
 				continue
 			}
 			// Don't allow turning back
 			if utils.InverseDir[currDir] == current.prevDir {
 				continue
 			}
-
+			// Avoid turning before minStraight steps
+			if turning && current.straightSteps < minStraight && current.prevDir != -1 {
+				continue
+			}
 
 			newStraightSteps := 0
-			if current.prevDir == currDir {
+			if !turning {
 				newStraightSteps = current.straightSteps + 1
 			}
 			cost := costs[current] + heatLosses[neighbour]

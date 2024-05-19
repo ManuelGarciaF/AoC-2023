@@ -2,27 +2,24 @@ package main
 
 import (
 	"bufio"
-	"cmp"
 	"fmt"
-	"math"
 	"os"
 	"regexp"
-	"slices"
 	"strconv"
+	"time"
 )
 
 func main() {
 	workflows, parts := parseInput(os.Args[1])
-	// Order workflows by name for binary search
-	slices.SortFunc(workflows, func(a, b Workflow) int {
-		return cmp.Compare(a.name, b.name)
-	})
 
+	start := time.Now()
 	fmt.Println("Part1:", solvePart1(workflows, parts))
+	end := time.Now()
+	fmt.Println("Time it took to solve part1: ", end.Sub(start))
+	// fmt.Println("Part2:", solvePart2(workflows))
 }
 
 type Workflow struct {
-	name        string
 	rules       []Rule
 	defaultNext string
 }
@@ -91,10 +88,10 @@ func (p Part) Total() int {
 	return p.x + p.m + p.a + p.s
 }
 
-func solvePart1(workflows []Workflow, parts []Part) int {
+func solvePart1(workflows map[string]Workflow, parts []Part) int {
 	sum := 0
 	for _, part := range parts {
-		curr := findWorkflow(workflows, "in")
+		curr := workflows["in"]
 		next := ""
 		for {
 			next = curr.Run(part)
@@ -105,7 +102,7 @@ func solvePart1(workflows []Workflow, parts []Part) int {
 			if next == "R" {
 				break
 			}
-			curr = findWorkflow(workflows, next)
+			curr = workflows[next]
 		}
 	}
 	return sum
@@ -113,21 +110,11 @@ func solvePart1(workflows []Workflow, parts []Part) int {
 
 const MIN_STAT, MAX_STAT = 1, 4000
 
-func solvePart2(workflows []Workflow) int {
+func solvePart2(workflows map[string]Workflow) int {
 	return 0
 }
 
-func findWorkflow(workflows []Workflow, name string) Workflow {
-	i, ok := slices.BinarySearchFunc(workflows, name, func(w Workflow, str string) int {
-		return cmp.Compare(w.name, str)
-	})
-	if !ok {
-		panic("Workflow not found:" + name)
-	}
-	return workflows[i]
-}
-
-func parseInput(inputPath string) ([]Workflow, []Part) {
+func parseInput(inputPath string) (map[string]Workflow, []Part) {
 	file, err := os.Open(inputPath)
 	if err != nil {
 		panic(err)
@@ -140,7 +127,7 @@ func parseInput(inputPath string) ([]Workflow, []Part) {
 	RulesRe := regexp.MustCompile(`([xmas])([<>])(\d+):([a-zAR]+),`)
 	PartRe := regexp.MustCompile(`{x=(\d+),m=(\d+),a=(\d+),s=(\d+)}`)
 
-	workflows := make([]Workflow, 0)
+	workflows := make(map[string]Workflow)
 	parts := make([]Part, 0)
 
 	scanningParts := false
@@ -189,7 +176,7 @@ func parseInput(inputPath string) ([]Workflow, []Part) {
 
 				rules = append(rules, Rule{stat, condition, value, next})
 			}
-			workflows = append(workflows, Workflow{name, rules, defaultNext})
+			workflows[name] = Workflow{rules, defaultNext}
 
 		} else { // Parse parts
 			tokens := PartRe.FindStringSubmatch(scanner.Text())

@@ -16,7 +16,10 @@ func main() {
 	fmt.Println("Part1:", solvePart1(workflows, parts))
 	end := time.Now()
 	fmt.Println("Time it took to solve part1: ", end.Sub(start))
+	start = time.Now()
 	// fmt.Println("Part2:", solvePart2(workflows))
+	end = time.Now()
+	// fmt.Println("Time it took to solve part2: ", end.Sub(start))
 }
 
 type Workflow struct {
@@ -108,10 +111,8 @@ func solvePart1(workflows map[string]Workflow, parts []Part) int {
 	return sum
 }
 
-const MIN_STAT, MAX_STAT = 1, 4000
-
 func solvePart2(workflows map[string]Workflow) int {
-	return 0
+	panic("Not Implemented")
 }
 
 func parseInput(inputPath string) (map[string]Workflow, []Part) {
